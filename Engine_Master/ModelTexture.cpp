@@ -1,6 +1,8 @@
 #include "ModuleTexture.h"
 #include "Globals.h"
-
+#include "DevIL/include/IL/il.h"
+#include "DevIL/include/IL/ilu.h"
+#include "DevIL/include/IL/ilut.h"
 
 ModuleTexture::ModuleTexture()
 {
@@ -19,14 +21,16 @@ bool ModuleTexture::Init()
 		return 1;
 	}
 	ilInit();
-	ilGenImages(1, &ImageName);
+	iluInit();
+	ilutInit();
+	ImageName = ilGenImage();
 	ilBindImage(ImageName);
 	bool imageLoaded = ilLoadImage(IMAGE_NAME);
 	ilEnable(IL_FILE_OVERWRITE);
-	if (imageLoaded == true)
+	if (imageLoaded)
 	{
 		LOG("Image loaded");
-		return true;
+		
 	}
 	else {
 		LOG("Image not loaded");
@@ -36,9 +40,10 @@ bool ModuleTexture::Init()
 	ILuint Width, Height;
 	Width = ilGetInteger(IL_IMAGE_WIDTH);
 	Height = ilGetInteger(IL_IMAGE_HEIGHT);
-	glGenTextures(1, &ImageName);
-	glBindTexture(GL_TEXTURE_2D, ImageName);
-	glTexImage2D(GL_TEXTURE_2D, 0, 3, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, Data);
+
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, Width, Height, 0, GL_RGBA, GL_UNSIGNED_BYTE, Data);
 
 	return true;
 }
@@ -60,7 +65,7 @@ update_status ModuleTexture::PostUpdate()
 
 bool ModuleTexture::CleanUp()
 {
-	ilDeleteImages(1, &ImageName);
-	glDeleteTextures(1, &ImageName);
+	//ilDeleteImages(1, &ImageName);
+	//glDeleteTextures(1, &ImageName);
 	return true;
 }

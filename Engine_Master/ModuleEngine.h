@@ -2,7 +2,7 @@
 #define _MODULEENGINE_H_
 
 #include "Module.h"
-#include "il.h"
+#include "DevIL/include/IL/il.h"
 #include "glew/include/GL/glew.h"
 #include "MathGeoLib/include/Math/float4x4.h"
 
@@ -26,6 +26,7 @@ class ModuleEngine:public Module {
 	private:
 		GLuint vbo;
 		GLuint ebo;
+		GLuint vao;
 		
 };
 

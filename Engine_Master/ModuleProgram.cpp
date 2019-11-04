@@ -30,6 +30,28 @@ bool ModuleProgram::Init()
 	glShaderSource(fragment_shader, 1, &fragment_shader_file, NULL);
 	delete fragment_shader_file;
 	glCompileShader(fragment_shader);
+
+	int check = NULL;
+	char checkok[512];
+	glGetShaderiv(fragment_shader, GL_COMPILE_STATUS, &check);
+	if (!check) {
+		glGetShaderInfoLog(fragment_shader, 512, NULL, checkok);
+		LOG("error compilando shader");
+		LOG(checkok);
+	}
+	//Creating shader program
+	shader_program = glCreateProgram();
+
+	//Attaching vertex shader to shader program
+	glAttachShader(shader_program, vertex_shader);
+
+	//Attaching fragment shader to shader program
+	glAttachShader(shader_program, fragment_shader);
+
+	//Linking shader program
+	glLinkProgram(shader_program);
+	glDeleteShader(vertex_shader);
+	glDeleteShader(fragment_shader);
 	return true;
 }
 
@@ -40,17 +62,7 @@ update_status ModuleProgram::PreUpdate()
 
 update_status ModuleProgram::Update()
 {
-	//Creating shader program
-	shader_program = glCreateProgram();
 	
-	//Attaching vertex shader to shader program
-	glAttachShader(shader_program, vertex_shader);
-
-	//Attaching fragment shader to shader program
-	glAttachShader(shader_program, fragment_shader);
-
-	//Linking shader program
-	glLinkProgram(shader_program);
 
 	return UPDATE_CONTINUE;
 }

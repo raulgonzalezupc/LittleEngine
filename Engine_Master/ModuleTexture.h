@@ -2,8 +2,10 @@
 #define _MODULETEXTURE_H_
 #include "Globals.h"
 #include "Module.h"
-#include "il.h"
 #include "glew/include/GL/glew.h"
+#include "DevIL/include/IL/il.h"
+
+typedef unsigned int   ILuint;
 
 class ModuleTexture : public Module {
 public:
@@ -18,6 +20,7 @@ public:
 
 public:
 	ILuint ImageName;
+	GLuint texture;
 };
 
 #endif

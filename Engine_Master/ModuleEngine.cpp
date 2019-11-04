@@ -43,7 +43,7 @@ unsigned int indices[] = {  // note that we start from 0!
 };
 
 	//setting up our aspect
-	/*float aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+	float aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
 
 	Frustum frustum;
 	frustum.type = FrustumType::PerspectiveFrustum;
@@ -59,7 +59,7 @@ unsigned int indices[] = {  // note that we start from 0!
 
 	//setting up our proj 
 	float4x4 proj = frustum.ProjectionMatrix();
-	float4x4 model = float4x4::FromTRS(float3(0.0F, 0.0F, -4.0F), float3x3::RotateY(PI / 4.0F), float3(1.0F, 1.0F, 1.0F));
+	float4x4 model = float4x4::FromTRS(float3(0.0F, 0.0F, -4.0F), float3x3::RotateY(0), float3(1.0F, 1.0F, 1.0F));
 	float4x4 view = float4x4::LookAt(float3(0.0F, 0.0F,-1.0F), float3(0.0F, 0.0F, -1.0F), float3(0.0F, 1.0F, 0.0F), float3(0.0F, 1.0F, 0.0F));
 	float4x4 transform = proj * view * float4x4(model);
 
@@ -84,7 +84,14 @@ unsigned int indices[] = {  // note that we start from 0!
 	float3 finalVertex2(tmp2.x / tmp2.w, tmp2.y / tmp2.w, tmp2.z / tmp2.w);
 	buffer_data[6] = finalVertex2.x;
 	buffer_data[7] = finalVertex2.y;
-	buffer_data[8] = finalVertex2.z;*/
+	buffer_data[8] = finalVertex2.z;
+
+	float4 vertex3(buffer_data[9], buffer_data[10], buffer_data[11], 1.0F);
+	float4 tmp3 = transform * vertex3;
+	float3 finalVertex3(tmp3.x / tmp3.w, tmp3.y / tmp3.w, tmp3.z / tmp3.w);
+	buffer_data[9] = finalVertex3.x;
+	buffer_data[10] = finalVertex3.y;
+	buffer_data[11] = finalVertex3.z;
 
 	//init of our vertex buffer object
 	glGenBuffers(1, &vbo);
@@ -98,7 +105,6 @@ unsigned int indices[] = {  // note that we start from 0!
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);// change to 3 if triangle
 
 	
 	return true;
@@ -108,29 +114,27 @@ unsigned int indices[] = {  // note that we start from 0!
 update_status ModuleEngine::PreUpdate()
 {
 	glUseProgram(App->shaders->shader_program);
-
-
 	return UPDATE_CONTINUE;
 }
 
 update_status ModuleEngine::Update()
 {
 	
+	glEnableVertexAttribArray(0); // attribute 0         
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0); //change if triangle
-	glEnableVertexAttribArray(0); // attribute 0         
 	//function to draw our tringle
 	//glDrawArrays(GL_TRIANGLES, 0, 3);
-	glEnableVertexAttribArray(1); 
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)(sizeof(float) * 3 * 3) );
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)(sizeof(float) * 3 * 4) );
 	glActiveTexture(GL_TEXTURE0); 
-	glBindTexture(GL_TEXTURE_2D, App->texture->ImageName); 
+	glBindTexture(GL_TEXTURE_2D, App->texture->texture); 
 	glUniform1i(glGetUniformLocation(App->shaders->shader_program, "texture0"), 0);
-
+	
 
 	//function to draw our rectangle
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 	return UPDATE_CONTINUE;
 }
 
@@ -143,7 +147,8 @@ bool ModuleEngine::CleanUp()
 {
 	//undbinding the drawing
 	glDisableVertexAttribArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glDisableVertexAttribArray(1);
+	//glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	return true;
 }

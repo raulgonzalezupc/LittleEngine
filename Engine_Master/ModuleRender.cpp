@@ -3,9 +3,6 @@
 #include "ModuleRender.h"
 #include "ModuleWindow.h"
 #include "glew/include/GL/glew.h"
-#include "imgui/imgui.h"
-#include "imgui/imgui_impl_opengl3.h"
-#include "imgui/imgui_impl_sdl.h"
 #include "SDL.h"
 
 ModuleRender::ModuleRender()
@@ -38,9 +35,6 @@ bool ModuleRender::Init()
 
 	//glew init
 	glewInit();
-	imguiglcontext = ImGui::CreateContext();
-	ImGui_ImplSDL2_InitForOpenGL(App->window->window, imguiglcontext);
-	ImGui::StyleColorsDark();
 
 
 	//info about hardware
@@ -56,9 +50,6 @@ bool ModuleRender::Init()
 
 update_status ModuleRender::PreUpdate()
 {
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplSDL2_NewFrame(App->window->window);
-	ImGui::NewFrame();
 	glViewport(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	return UPDATE_CONTINUE;
@@ -73,20 +64,15 @@ update_status ModuleRender::Update()
 update_status ModuleRender::PostUpdate()
 {
 	//update a window with OpenGL rendering
-	ImGui::Render();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-	SDL_GL_SwapWindow(App->window->window);
 	return UPDATE_CONTINUE;
 }
 
 // Called before quitting
 bool ModuleRender::CleanUp()
 {
-	LOG("Destroying renderer");
+	LOG("Destroying renderer");
+
 	//Destroy wndow
-	ImGui_ImplOpenGL3_Shutdown();
-	ImGui_ImplSDL2_Shutdown();
-	ImGui::DestroyContext();
 	return true;
 }
 
